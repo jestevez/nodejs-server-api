@@ -12,6 +12,6 @@ module.exports = {
     loggerLevel: process.env.LOGGER_LEVEL || 'info',
     enableHTTPS: process.env.ENABLE_HTTPS === 'true',
     db: {
-        url: "mongodb://localhost:27017/saime-test"
+        url: "mongodb://localhost:27017/api-test"
     }
 };

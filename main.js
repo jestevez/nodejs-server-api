@@ -7,7 +7,6 @@ const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 
-const mongoose = require('mongoose');
 const uuid = require('uuid');
 const http = require('http');
 const https = require('https');
@@ -27,7 +26,7 @@ expressApp.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 // ENABLE_HTTPS=true LOGGER_LEVEL=debug DEBUG=nodejs-server-api node main.js
 
 const debug = require('debug')('nodejs-server-api');
-const name = 'Mi API RESTful ' + id;
+const name = 'Mi API RESTful ' + id + " __dirname " +__dirname;
 debug('booting %s', name);
 
 
@@ -41,13 +40,7 @@ require('./config/headers')(expressApp);
 require('./config/express')(expressApp);
 require('./config/routes')(expressApp, router);
 
-// Use bluebird
-mongoose.Promise = require('bluebird');
-// mongodb    
-mongoose.connect(config.db.url);
-mongoose.connection.on('open', function() {
-    logger.info('Mongoose connected.');
-});
+
 
 // setup http/https base server
 var server;

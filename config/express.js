@@ -32,8 +32,6 @@ module.exports = function (app) {
     app.use(cookieParser());
 
 
-
-
 //    app.set('showStackError', true);
 //    app.set('json spaces', 0);
 //    app.enable('jsonp callback');
