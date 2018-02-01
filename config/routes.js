@@ -16,6 +16,10 @@ module.exports = function (app, router) {
 
     var apiPrefix = config.apiPrefix;
 
+    // Endpoint API SAIME V2
+     
+
+
     // Version
     router.route('/version').get(index.version);
 
@@ -47,23 +51,38 @@ module.exports = function (app, router) {
       oauth
         .token(request,response)
         .then(function(token) {
-          // Todo: remove unnecessary values in response
-          return res.json(token)
+            // The resource owner granted the access request.
+    
+            // Remove unnecessary values in response
+            delete token.client;
+            delete token.user;
+            
+            return res.json(token);
         }).catch(function(err){
-          return res.status(500).json(err)
+            // The request was invalid or not authorized.
+            return res.status(500).json(err);
         })
     });
 
-    router.post('/authorise', function(req, res){
+    const AccessDeniedError = require('oauth2-server/lib/errors/access-denied-error');
+    
+    router.post('/authorize', function(req, res){
       var request = new Request(req);
       var response = new Response(res);
-
+      
       return oauth.authorize(request, response).then(function(success) {
         //  if (req.body.allow !== 'true') return callback(null, false);
         //  return callback(null, true, req.user);
-          res.json(success)
+          res.json(success);
       }).catch(function(err){
-        res.status(err.code || 500).json(err)
+          if (err instanceof AccessDeniedError) {
+            // The resource owner denied the access request.
+            res.status(err.code || 401).json(err);
+          } else {
+            // Access was not granted due to some other error condition.
+            res.status(err.code || 500).json(err);
+          }
+        
       })
     });
 
@@ -86,7 +105,7 @@ module.exports = function (app, router) {
     
     // Secure
     router.get('/secure', authenticate(), function(req,res){
-        res.json({message: 'Secure data'});
+        res.json({message: 'Ya tienes el BearerToken! '});
     });
     
     
