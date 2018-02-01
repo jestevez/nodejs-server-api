@@ -59,3 +59,4 @@ typings/
 
 package-lock.json
 nbproject
+/etc/mongo-dump/

@@ -5,7 +5,7 @@ var pjson = require('../package.json');
 var version = pjson.version;
 
 module.exports = {
-    apiPrefix: '/api/',
+    apiPrefix: '/saime-ws/v2.0/',
     port: 3000,
     version: version,
     publicPath: process.env.PUBLIC_PATH || false,

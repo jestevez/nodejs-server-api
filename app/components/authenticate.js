@@ -18,18 +18,16 @@ module.exports = function(options){
     });
     var response = new Response(res);
 
-    oauth.authenticate(request, response,options)
+    oauth.authenticate(request, response, options)
       .then(function (token) {
-        console.log("then");
-        // Request is authorized.
+        // The request was successfully authenticated.
+
         req.user = token;
         next();
       })
-      .catch(function (err) {
-          
-        console.log("err", err);
-        // Request is not authorized.
-        res.status(err.code || 500).json(err);
+      .catch(function (err) {          
+        // The request failed authentication.
+        res.status(err.code || 401).json(err);
       });
   };
 };
