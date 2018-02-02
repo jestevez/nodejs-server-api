@@ -215,7 +215,7 @@ function getUserFromClient(client) {
 
 function getRefreshToken(refreshToken) {
   logger.debug('getRefreshToken %s', refreshToken);
-  if (!refreshToken || refreshToken === 'undefined') return false
+  if (!refreshToken || refreshToken === 'undefined') return false;
 //[OAuthClient, User]
   return OAuthRefreshToken
     .findOne({refresh_token: refreshToken})

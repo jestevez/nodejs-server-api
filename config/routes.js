@@ -7,17 +7,59 @@ const Response = oauthServer.Response;
 
 const config = require('./config');
 const index = require('../app/controllers/index');
+const UserController = require('../app/controllers/UserController');
 const authenticate = require('../app/components/authenticate');
 const oauth = require('../app/components/oauth');
 
 const db =  require('../app/models');
+
+const { check, oneOf, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
+
+function isValidDate(value) {
+  if (!value.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+  const date = new Date(value);
+  if (!date.getTime()) return false;
+  return date.toISOString().slice(0, 10) === value;
+}
 
 module.exports = function (app, router) {
 
     var apiPrefix = config.apiPrefix;
 
     // Endpoint API SAIME V2
-     
+    router.route('/users')
+        .post(oneOf([
+            [
+                check('username').exists(),
+                check('password').exists(),
+                check('idpersona').exists(),
+                check('cedula').exists(),
+                check('letra').exists(),
+                check('emailalternativo').exists(),
+                check('primernombre').exists(),
+                check('primerapellido').exists(),
+                check('segundonombre').exists(),
+                check('segundoapellido').exists(),
+                check('sexo').exists(),
+                check('fechanacimiento').exists(),
+                check('telefono').exists(),
+                check('cedulado').exists(),
+                check('idpais').exists(),
+                check('nacionalidad').exists(),
+                check('callcenter').exists(),
+                check('estadocivil').exists()
+                
+                , check('username').isEmail().withMessage('must be an email').trim().normalizeEmail()
+                , check('password', 'passwords must be at least 5 chars long').isLength({ min: 5 })
+                , check('password', 'contain one number').matches(/\d/)
+                , check('fechanacimiento').custom(isValidDate).withMessage('the date must be valid')
+                , check('sexo', 'sexo invalid length').isLength({ max: 1 })
+                , check('letra', 'letra invalid length').isLength({ max: 1 })
+            ]
+            
+            
+          ]), UserController.postUsers);
 
 
     // Version

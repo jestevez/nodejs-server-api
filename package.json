@@ -13,10 +13,12 @@
     "author": "Jose Luis Estevez jose.estevez.prieto@gmail.com",
     "contributors": [],
     "dependencies": {
+        "bcrypt-nodejs": "0.0.3",
         "body-parser": "^1.18.2",
         "cookie-parser": "^1.4.3",
         "debug": "^3.1.0",
         "express": "^4.16.2",
+        "express-validator": "^4.3.0",
         "lodash": "^4.17.4",
         "lodash-cli": "^4.17.4",
         "mongoose": "^5.0.2",

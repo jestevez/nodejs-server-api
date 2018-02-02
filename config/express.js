@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const validator = require('express-validator');
 
 const config = require('./config');
 const logger = require('../lib/logger').logger;
@@ -30,7 +31,7 @@ module.exports = function (app) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
-
+    app.use(validator());
 
 //    app.set('showStackError', true);
 //    app.set('json spaces', 0);
