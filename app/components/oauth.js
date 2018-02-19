@@ -11,7 +11,8 @@ const oauth = new OAuth2Server({
   addAcceptedScopesHeader: true,                   // Set the X-Accepted-OAuth-Scopes HTTP header on response objects.
   addAuthorizedScopesHeader: true,                 // Set the X-OAuth-Scopes HTTP header on response objects.
   accessTokenLifetime: 4 * 60 * 60,                // Lifetime of generated access tokens in seconds (default = 1 hour).
-  refreshTokenLifetime: 3600                       // Lifetime of generated refresh tokens in seconds (default = 2 weeks).
+  refreshTokenLifetime: 3600,                      // Lifetime of generated refresh tokens in seconds (default = 2 weeks).
+  requireClientAuthentication: {password: false}
 });
 
 module.exports = oauth;

@@ -6,7 +6,7 @@ const oauth = require('./oauth');
 
 //const config = require('../config/config');
 //const logger = require('../lib/logger').logger;
-
+// https://oauth2-server.readthedocs.io/en/latest/api/oauth2-server.html#authenticate-request-response-options-callback
 module.exports = function(options){
   var options = options || {};
   return function(req, res, next) {

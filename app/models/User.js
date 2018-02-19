@@ -5,9 +5,16 @@ const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-    username:            { type: String, required: true },
+    username:            { type: String, required: true, unique : true},
     password:            { type: String, required: true },
     scope:               { type: String, required: true },  
+    
+    resetPasswordToken:  { type: String, required: false, unique : true},  
+    resetPasswordExpires:{ type: Date, required: false},
+    verifyEmailToken:    { type: String, required: false, unique : true},  
+    verifyEmailExpires:  { type: Date, required: false},
+    verifyEmail:         { type: Boolean, default: false},
+    
     idregistrousuario:   { type: String, required: false },
     idpersona:           { type: String, required: true },
     cedula:              { type: String, required: true },

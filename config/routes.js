@@ -27,7 +27,16 @@ module.exports = function (app, router) {
 
     var apiPrefix = config.apiPrefix;
 
-    // Endpoint API SAIME V2
+    // Validar si un correo ya esta en uso dentro de la aplicación
+    router.route('/email').post(oneOf([
+            [ check('email').exists(),                
+            , check('email').isEmail().withMessage('must be an email').trim().normalizeEmail()
+            ]]), basic(), UserController.checkEmail);
+        
+    // Modificar datos del usuario
+    router.put('/users', UserController.putUsers);
+    
+    // Dar de alta un nuevo usuario
     router.route('/users')
         .post(oneOf([
             [
@@ -57,14 +66,35 @@ module.exports = function (app, router) {
                 , check('sexo', 'sexo invalid length').isLength({ max: 1 })
                 , check('letra', 'letra invalid length').isLength({ max: 1 })
             ]
-            
-            
           ]), UserController.postUsers);
 
-
+    // Validar token de verificación
+    router.get('/verify/:token', UserController.getVerify);
+    
+    // Veriificar correo de alta de usuario
+    router.post('/verify/:token', UserController.postVerify);
+    
+    // Si el token de alta expiro solicitar uno nuevo
+    router.put('/verify', UserController.putVerify);
+    
+    // Recuperar contraseña
+    router.route('/forgot').post(oneOf([
+            [ check('email').exists(),                
+            , check('email').isEmail().withMessage('must be an email').trim().normalizeEmail()
+            ]]), UserController.forgot);    
+    
+    // Verificar token de olvido de contraseña
+    router.get('/reset/:token', UserController.getReset);
+    
+    // Cambiar contraseña con token de olvido de contraseña
+    router.post('/reset/:token', UserController.postReset);
+    
     // Version
     router.route('/version').get(index.version);
 
+    
+    
+    
     
     // Home
     router.get('/', function(req, res, next) {
@@ -73,17 +103,14 @@ module.exports = function (app, router) {
     
     router.get('/me', authenticate(), function(req,res){
         res.json({
-          me: req.user,
-          messsage: 'Authorization success, Without Scopes, Try accessing /profile with `profile` scope',
-          description: 'Try postman https://www.getpostman.com/collections/37afd82600127fbeef28',
-          more: 'pass `profile` scope while Authorize'
-        })
+          me: req.user
+        });
     });
 
     router.get('/profile', authenticate({scope:'profile'}), function(req,res){
         res.json({
           profile: req.user
-        })
+        });
     });
 
     router.all('/oauth/token', function(req,res,next){
@@ -178,5 +205,4 @@ module.exports = function (app, router) {
     // Register all our routes
     app.use(apiPrefix, router);
 };
-
 

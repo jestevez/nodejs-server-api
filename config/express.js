@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const validator = require('express-validator');
+const session = require('express-session');
 
 const config = require('./config');
 const logger = require('../lib/logger').logger;
@@ -32,7 +33,8 @@ module.exports = function (app) {
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(validator());
-
+    app.use(session({ secret: 'Giyaebei3xeev3gep5sooceiDu2neithaichohTu' }));
+    
 //    app.set('showStackError', true);
 //    app.set('json spaces', 0);
 //    app.enable('jsonp callback');

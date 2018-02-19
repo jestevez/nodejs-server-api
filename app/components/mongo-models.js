@@ -9,8 +9,8 @@ const OAuthRefreshToken = mongodb.OAuthRefreshToken;
 const logger = require('../../lib/logger').logger;
 
 
-
  
+
 
 function getAccessToken(bearerToken) {
     logger.debug('getAccessToken %s*****', bearerToken.substring(0, 6) );
