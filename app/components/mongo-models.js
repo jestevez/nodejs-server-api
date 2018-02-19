@@ -9,8 +9,8 @@ const OAuthRefreshToken = mongodb.OAuthRefreshToken;
 const logger = require('../../lib/logger').logger;
 
 
-
  
+
 
 function getAccessToken(bearerToken) {
     logger.debug('getAccessToken %s*****', bearerToken.substring(0, 6) );
@@ -215,7 +215,7 @@ function getUserFromClient(client) {
 
 function getRefreshToken(refreshToken) {
   logger.debug('getRefreshToken %s', refreshToken);
-  if (!refreshToken || refreshToken === 'undefined') return false
+  if (!refreshToken || refreshToken === 'undefined') return false;
 //[OAuthClient, User]
   return OAuthRefreshToken
     .findOne({refresh_token: refreshToken})

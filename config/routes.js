@@ -7,22 +7,94 @@ const Response = oauthServer.Response;
 
 const config = require('./config');
 const index = require('../app/controllers/index');
+const UserController = require('../app/controllers/UserController');
 const authenticate = require('../app/components/authenticate');
 const oauth = require('../app/components/oauth');
 
 const db =  require('../app/models');
 
+const { check, oneOf, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
+
+function isValidDate(value) {
+  if (!value.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+  const date = new Date(value);
+  if (!date.getTime()) return false;
+  return date.toISOString().slice(0, 10) === value;
+}
+
 module.exports = function (app, router) {
 
     var apiPrefix = config.apiPrefix;
 
-    // Endpoint API SAIME V2
-     
+    // Validar si un correo ya esta en uso dentro de la aplicación
+    router.route('/email').post(oneOf([
+            [ check('email').exists(),                
+            , check('email').isEmail().withMessage('must be an email').trim().normalizeEmail()
+            ]]), basic(), UserController.checkEmail);
+        
+    // Modificar datos del usuario
+    router.put('/users', UserController.putUsers);
+    
+    // Dar de alta un nuevo usuario
+    router.route('/users')
+        .post(oneOf([
+            [
+                check('username').exists(),
+                check('password').exists(),
+                check('idpersona').exists(),
+                check('cedula').exists(),
+                check('letra').exists(),
+                check('emailalternativo').exists(),
+                check('primernombre').exists(),
+                check('primerapellido').exists(),
+                check('segundonombre').exists(),
+                check('segundoapellido').exists(),
+                check('sexo').exists(),
+                check('fechanacimiento').exists(),
+                check('telefono').exists(),
+                check('cedulado').exists(),
+                check('idpais').exists(),
+                check('nacionalidad').exists(),
+                check('callcenter').exists(),
+                check('estadocivil').exists()
+                
+                , check('username').isEmail().withMessage('must be an email').trim().normalizeEmail()
+                , check('password', 'passwords must be at least 5 chars long').isLength({ min: 5 })
+                , check('password', 'contain one number').matches(/\d/)
+                , check('fechanacimiento').custom(isValidDate).withMessage('the date must be valid')
+                , check('sexo', 'sexo invalid length').isLength({ max: 1 })
+                , check('letra', 'letra invalid length').isLength({ max: 1 })
+            ]
+          ]), UserController.postUsers);
 
-
+    // Validar token de verificación
+    router.get('/verify/:token', UserController.getVerify);
+    
+    // Veriificar correo de alta de usuario
+    router.post('/verify/:token', UserController.postVerify);
+    
+    // Si el token de alta expiro solicitar uno nuevo
+    router.put('/verify', UserController.putVerify);
+    
+    // Recuperar contraseña
+    router.route('/forgot').post(oneOf([
+            [ check('email').exists(),                
+            , check('email').isEmail().withMessage('must be an email').trim().normalizeEmail()
+            ]]), UserController.forgot);    
+    
+    // Verificar token de olvido de contraseña
+    router.get('/reset/:token', UserController.getReset);
+    
+    // Cambiar contraseña con token de olvido de contraseña
+    router.post('/reset/:token', UserController.postReset);
+    
     // Version
     router.route('/version').get(index.version);
 
+    
+    
+    
     
     // Home
     router.get('/', function(req, res, next) {
@@ -31,17 +103,14 @@ module.exports = function (app, router) {
     
     router.get('/me', authenticate(), function(req,res){
         res.json({
-          me: req.user,
-          messsage: 'Authorization success, Without Scopes, Try accessing /profile with `profile` scope',
-          description: 'Try postman https://www.getpostman.com/collections/37afd82600127fbeef28',
-          more: 'pass `profile` scope while Authorize'
-        })
+          me: req.user
+        });
     });
 
     router.get('/profile', authenticate({scope:'profile'}), function(req,res){
         res.json({
           profile: req.user
-        })
+        });
     });
 
     router.all('/oauth/token', function(req,res,next){
@@ -136,5 +205,4 @@ module.exports = function (app, router) {
     // Register all our routes
     app.use(apiPrefix, router);
 };
-
 
