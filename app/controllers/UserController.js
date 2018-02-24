@@ -429,3 +429,20 @@ exports.postUsers = function (req, res) {
     });
 };
 
+
+exports.me = function(req,res){
+    
+        var user = req.user;
+        
+        user.User.username = undefined;
+        user.User.password = undefined;
+        user.User.resetPasswordToken = undefined;
+        user.User.resetPasswordExpires = undefined;
+        user.User.verifyEmailToken = undefined;
+        user.User.verifyEmailExpires = undefined;
+        user.User.verifyEmail = undefined;
+        
+        return res.json(user.User);
+        
+        
+    };

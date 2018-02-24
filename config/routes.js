@@ -23,15 +23,18 @@ function isValidDate(value) {
   return date.toISOString().slice(0, 10) === value;
 }
 
-module.exports = function (app, router) {
+const apiPrefix = config.apiPrefix;
 
-    var apiPrefix = config.apiPrefix;
+const express = require('express');
+const router = express.Router();
+
+module.exports = function (app) {
 
     // Validar si un correo ya esta en uso dentro de la aplicación
     router.route('/email').post(oneOf([
             [ check('email').exists(),                
             , check('email').isEmail().withMessage('must be an email').trim().normalizeEmail()
-            ]]), basic(), UserController.checkEmail);
+            ]]), UserController.checkEmail);
         
     // Modificar datos del usuario
     router.put('/users', UserController.putUsers);
@@ -92,20 +95,9 @@ module.exports = function (app, router) {
     // Version
     router.route('/version').get(index.version);
 
+    // me
+    router.route('/me').get(authenticate(), UserController.me);
     
-    
-    
-    
-    // Home
-    router.get('/', function(req, res, next) {
-        res.render('index', { title: 'Api '+index.version });
-    });
-    
-    router.get('/me', authenticate(), function(req,res){
-        res.json({
-          me: req.user
-        });
-    });
 
     router.get('/profile', authenticate({scope:'profile'}), function(req,res){
         res.json({
@@ -135,7 +127,7 @@ module.exports = function (app, router) {
 
     const AccessDeniedError = require('oauth2-server/lib/errors/access-denied-error');
     
-    router.post('/authorize', function(req, res){
+    router.post('/authorise', function(req, res){
       var request = new Request(req);
       var response = new Response(res);
       
@@ -172,37 +164,45 @@ module.exports = function (app, router) {
     });
     
     
-    // Secure
-    router.get('/secure', authenticate(), function(req,res){
-        res.json({message: 'Ya tienes el BearerToken! '});
-    });
-    
-    
-
-    // Dummy
-    router.get('/test', function (req, res) {
-        var data = {
-            name: 'Jose Luis Estevez',
-            website: 'http://joseluisestevez.com'
-        };
-        res.json(data);
-    });
-
-
-    router.post('/post', function (req, res) {
-
-        if (req.body.Id && req.body.Title && req.body.Director &&
-                req.body.Year && req.body.Rating) {
-
-            res.status(200).json({Id: req.body.Id})
-            
-        } else {
-            res.status(500).json({error: 'There was an error!'});
-        }
-
-    });
-    
     // Register all our routes
     app.use(apiPrefix, router);
+    
+    
+    
+    // catch 404 and forward to error handler
+    app.use(function(req, res, next) {
+      var err = new Error('Not Found');
+      res.status(404);
+        res.send({
+            message: err.message,
+            error:  'Not Found'
+        });
+    });
+
+    // error handlers
+    // NODE_ENV=development node app.js
+    // development error handler
+    // will print stacktrace
+    if (app.get('env') === 'development') {
+      app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.send({
+            message: err.message,
+            error: err
+        });
+      });
+    }
+
+    // production error handler
+    // no stacktraces leaked to user
+    app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      res.send({
+        message: err.message,
+        error: err
+        });
+    });
+
+    
 };
 

@@ -19,7 +19,6 @@ const id = uuid.v1();
 
 
 var expressApp = express();
-var router = express.Router();
 expressApp.use(express.static(path.join(__dirname, 'public')));
 expressApp.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
@@ -30,16 +29,12 @@ const name = 'Mi API RESTful ' + id + " __dirname " +__dirname;
 debug('booting %s', name);
 
 
-
-
-
 // setup headers
 require('./config/headers')(expressApp);
 
 // express settings
 require('./config/express')(expressApp);
-require('./config/routes')(expressApp, router);
-
+require('./config/routes')(expressApp);
 
 
 // setup http/https base server
@@ -60,8 +55,3 @@ server.listen(config.port, function () {
 
 //expose app
 exports = module.exports = expressApp;
-
-
-
-
-
