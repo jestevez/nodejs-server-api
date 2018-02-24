@@ -37,32 +37,53 @@ module.exports = function (app) {
             ]]), UserController.checkEmail);
         
     // Modificar datos del usuario
-    router.put('/users', UserController.putUsers);
+    router.route('/users').put(oneOf([
+            [
+                check('username').exists()
+                , check('password').exists()
+                , check('cedula').exists()
+                , check('letra').exists()
+                , check('emailalternativo').exists()
+                , check('primernombre').exists()
+                , check('primerapellido').exists()
+                , check('segundonombre').exists()
+                , check('segundoapellido').exists()
+                , check('sexo').exists()
+                , check('telefono').exists()
+                
+                , check('username').isEmail().withMessage('must be an email').trim().normalizeEmail()
+                , check('emailalternativo').isEmail().withMessage('must be an email').trim().normalizeEmail()
+                , check('password', 'passwords must be at least 5 chars long').isLength({ min: 5 })
+                , check('password', 'contain one number').matches(/\d/)
+                , check('letra', 'letra invalid length').isLength({ max: 1 })
+            ]
+          ]), authenticate(), UserController.putUsers);
     
     // Dar de alta un nuevo usuario
     router.route('/users')
         .post(oneOf([
             [
-                check('username').exists(),
-                check('password').exists(),
-                check('idpersona').exists(),
-                check('cedula').exists(),
-                check('letra').exists(),
-                check('emailalternativo').exists(),
-                check('primernombre').exists(),
-                check('primerapellido').exists(),
-                check('segundonombre').exists(),
-                check('segundoapellido').exists(),
-                check('sexo').exists(),
-                check('fechanacimiento').exists(),
-                check('telefono').exists(),
-                check('cedulado').exists(),
-                check('idpais').exists(),
-                check('nacionalidad').exists(),
-                check('callcenter').exists(),
-                check('estadocivil').exists()
+                , check('username').exists()
+                , check('password').exists()
+                , check('idpersona').exists()
+                , check('cedula').exists()
+                , check('letra').exists()
+                , check('emailalternativo').exists()
+                , check('primernombre').exists()
+                , check('primerapellido').exists()
+                , check('segundonombre').exists()
+                , check('segundoapellido').exists()
+                , check('sexo').exists()
+                , check('fechanacimiento').exists()
+                , check('telefono').exists()
+                , check('cedulado').exists()
+                , check('idpais').exists()
+                , check('nacionalidad').exists()
+                , check('callcenter').exists()
+                , check('estadocivil').exists()
                 
                 , check('username').isEmail().withMessage('must be an email').trim().normalizeEmail()
+                , check('emailalternativo').isEmail().withMessage('must be an email').trim().normalizeEmail()
                 , check('password', 'passwords must be at least 5 chars long').isLength({ min: 5 })
                 , check('password', 'contain one number').matches(/\d/)
                 , check('fechanacimiento').custom(isValidDate).withMessage('the date must be valid')

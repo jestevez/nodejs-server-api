@@ -8,7 +8,7 @@ const logger = require(__dirname + '/../../lib/logger').logger;
 const mail = require(__dirname + '/../components/mailer');
 
 const crypto = require('crypto');
-
+const uuid = require('uuid');
 
 const {check, oneOf, validationResult} = require('express-validator/check');
 const {matchedData, sanitize} = require('express-validator/filter');
@@ -46,7 +46,59 @@ exports.checkEmail = function (req, res) {
 };
 
 exports.putUsers = function (req, res) {
-    res.send('NOT IMPLEMENTED!');
+    const errors = validationResult(req);
+    console.log(errors.isEmpty());
+    if (!errors.isEmpty()) {
+        return res.status(422).json({validationsErrors: errors.mapped()});
+    }
+
+    var username = req.body.username.toLowerCase();
+    var password = req.body.password;
+    var cedula = req.body.cedula;
+    var letra = req.body.letra;
+    var emailalternativo = req.body.emailalternativo.toLowerCase();
+    var primernombre = req.body.primernombre;
+    var primerapellido = req.body.primerapellido;
+    var segundonombre = req.body.segundonombre;
+    var segundoapellido = req.body.segundoapellido;
+    var sexo = req.body.sexo;
+    var telefono = req.body.telefono;
+    
+    console.log("User ", req.user.User);
+    console.log("username ", username);
+    
+    
+    User.findOne({_id: req.user.User._id})
+        .then(function (user) {
+            if (!user) {
+                return res.status(400).json({
+                    message: 'Invalid user.',
+                    messageCode: '99999',
+                    error: true
+                });
+            } else {
+                logger.info('encontrado el usuario ' + user.username);
+                return User.update({username: user.username}, {
+                        emailalternativo: emailalternativo, 
+                        telefono: telefono,
+                        password: password
+                    })
+                    .then(function () {
+                        logger.info('save token ' + user.username);
+                        return res.json({
+                            message: 'Su datos han sido modificados correctamente',
+                            messageCode: '00000',
+                            error: false
+                        });
+                    }).catch(function (err) {
+                        logger.error('User save token - Err: %s', err);
+                        return res.status(500).json(err);
+                    });  
+            }
+        }).catch(function (err) {
+            logger.error('getReset - Err: %s', err);
+            return res.status(500).json(err);
+        });
 };
 
 exports.postReset = function (req, res) {
@@ -331,7 +383,7 @@ exports.postUsers = function (req, res) {
     var nacionalidad = req.body.nacionalidad;
     var callcenter = req.body.callcenter;
     var estadocivil = req.body.estadocivil;
-
+    
     // Validaciones
 
     User.findOne({username: username})
@@ -372,6 +424,7 @@ exports.postUsers = function (req, res) {
         password: password,
         scope: scope,
         idpersona: idpersona,
+        idregistrousuario: uuid.v1(),
         cedula: cedula,
         letra: letra,
         emailalternativo: emailalternativo,
