@@ -29,7 +29,7 @@
 
   Run the main application:
 
-    $ node insight.js
+    $ node main.js
 
   Then open a browser and go to:
 
